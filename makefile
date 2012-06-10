@@ -5,7 +5,8 @@ DOXYGEN=/Applications/Doxygen.app/Contents/Resources/doxygen
 
 # Compiler and options
 CC	= gcc
-OPT	= -Wall -O3 -g -DSYMTRX_VERSION=\"1.0\" -DSYMTRX_BUILD=\"`svnversion -n .`\"
+OPT	= -Wall -O3 -g -DSYMTRX_VERSION=\"0.1\" -DSYMTRX_BUILD=\"`git describe`\"
+# I MUSTN"T FORGET TO ADD GIT TAGS TO CHANGE THE VERSION!
 
 # ======================================== #
 
