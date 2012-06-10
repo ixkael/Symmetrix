@@ -1,0 +1,27 @@
+# Ignore C/F90 compiled objects, modules and libraries
+
+bin/*
+*.o
+*.mod
+*.a
+*~
+*.end
+*.bbl
+*.tdo
+*.pdf
+*.log
+*.swp
+*.aux
+*.synctex.gz
+*.blg
+
+# As well as usual OSX files
+.DS_Store
+Icon?
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
