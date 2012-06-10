@@ -11,12 +11,12 @@
  * \param[in]  dim The dimensions.
  * \retval Its size in memory.
  */
-int bisym_size(dim){
+int bisym_size(int dim){
 
   if( dim % 2 == 0 ) // even 
     return dim*(dim+2)/4;
   else{ //odd
-    int n = floor(n/2);
+    int n = floor(dim/2);
     return n*(n+1) + n + 1;
   }
 
@@ -125,7 +125,7 @@ int bisym_assertequal(double *matcomp1, double *matcomp2, int dim)
   int i, j;
   for(i = 0; i < dim; i++)
     for(j = 0; j <= MIN(i, dim-i-1); j++)
-      if( cabs(matcomp1[ bisym_ind(i,j,dim) ] - matcomp2[ bisym_ind(i,j,dim)]) > PRECISION  ){
+      if( abs(matcomp1[ bisym_ind(i,j,dim) ] - matcomp2[ bisym_ind(i,j,dim)]) > PRECISION  ){
         //WARNING: printf("Problem : %2.3e - %2.3e = %2.3e\n",matcomp1[ centrosym_ind(i,j,dim) ],matcomp2[ centrosym_ind(i,j,dim) ], matcomp1[ centrosym_ind(i,j,dim) ] - matcomp2[ centrosym_ind(i,j,dim)]);
         return 0;
       }
@@ -204,13 +204,13 @@ int bisym_isvalid(double *mat, int dim)
   for(i = 0; i < dim; i++){
     for(j = 0; j < dim; j++){
       if( 
-          cabs(mat[ square_ind(i,j,dim) ] 
+          abs(mat[ square_ind(i,j,dim) ] 
             - mat[ square_ind(dim-i-1,dim-j-1,dim) ]) > PRECISION 
           ||
-          cabs(mat[ square_ind(i,j,dim) ] 
+          abs(mat[ square_ind(i,j,dim) ] 
             - mat[ square_ind(j,i,dim) ]) > PRECISION 
           ||
-          cabs(mat[ square_ind(i,j,dim) ] 
+          abs(mat[ square_ind(i,j,dim) ] 
             - mat[ square_ind(dim-j-1,dim-i-1,dim) ]) > PRECISION 
           ){
         //WARNING: printf("Problem : %2.3e != %2.3e\n",mat[ square_ind(i,j,dim) ],mat[ square_ind(dim-i-1,dim-j-1,dim) ]);

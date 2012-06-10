@@ -33,36 +33,36 @@ void centrosym_alloc(double **mat, int dim)
 
 }
 
-
-/*!
- * Return index for the (i,j)th elements of a centrosymmetric square matrix (safe version; works for any index).
- *
- * \param[in]  i Row index.
- * \param[in]  j Column index.
- * \param[in]  dim Matrix dimension.
- * \retval The index in memory of the j-th element of the i-th row.
- */
-int centrosym_ind2(int i, int j, int dim){
-
-  if( j <= i )
-    return i * (i + 1) / 2 + j ;
-  else
-    return centrosym_ind(dim-i-1, dim-j-1);
-
-}
-
-
 /*!
  * Return index for the (i,j)th elements of a centrosymmetric square matrix (fast; must have j <= i).
+ * Naive indexing : row by row
  *
  * \param[in]  i Row index.
  * \param[in]  j Column index.
  * \param[in]  dim Matrix dimension.
  * \retval The index of the j-th element of the i-th row.
  */
-int centrosym_ind(int i, int j){
+int centrosym_ind(int i, int j, int dim){  // NAIVE INDEXING: ROW by ROW
 
   return i * (i + 1) / 2 + j ;
+
+}
+
+/*!
+ * Return index for the (i,j)th elements of a centrosymmetric square matrix (fast; must have j <= i).
+ * Second indexing : diagonal by diagonal
+ *
+ * \param[in]  i Row index.
+ * \param[in]  j Column index.
+ * \param[in]  dim Matrix dimension.
+ * \retval The index of the j-th element of the i-th row.
+ */
+int centrosym_ind2(int i, int j, int dim){  // SECOND INDEXING: DIAG by DIAG
+
+  int N = dim - 2;
+  int k = i - j;
+
+  return 2 * i - j + N * k - k * (k + 1) / 2 + k;
 
 }
 
@@ -105,7 +105,7 @@ void centrosym_full_extractcomp(double *matcomp, double *matfull, int dim)
   int i, j;
   for(i = 0; i < dim; i++)
     for(j = 0; j <= i; j++)
-      matcomp[ centrosym_ind(i,j) ] = matfull[ square_ind(i,j,dim) ];
+      matcomp[ centrosym_ind(i,j,dim) ] = matfull[ square_ind(i,j,dim) ];
 
 }
 
@@ -124,8 +124,8 @@ int centrosym_assertequal(double *matcomp1, double *matcomp2, int dim)
   int i, j;
   for(i = 0; i < dim; i++)
     for(j = 0; j <= i; j++)
-      if( abs(matcomp1[ centrosym_ind(i,j) ] - matcomp2[ centrosym_ind(i,j)]) > PRECISION  ){
-        //printf("Problem : %2.3e - %2.3e = %2.3e\n",matcomp1[ centrosym_ind(i,j,dim) ],matcomp2[ centrosym_ind(i,j,dim) ], matcomp1[ centrosym_ind(i,j,dim) ] - matcomp2[ centrosym_ind(i,j,dim)]);
+      if( abs(matcomp1[ centrosym_ind(i,j,dim) ] - matcomp2[ centrosym_ind(i,j,dim)]) > PRECISION  ){
+        //printf("Problem : %2.1f - %2.1f = %2.1e\n",matcomp1[ centrosym_ind(i,j,dim) ],matcomp2[ centrosym_ind(i,j,dim) ], matcomp1[ centrosym_ind(i,j,dim) ] - matcomp2[ centrosym_ind(i,j,dim)]);
         return 0;
       }
   return 1;   
@@ -145,7 +145,7 @@ void centrosym_print(double *mat, int dim)
   int i, j;
   for(i = 0; i < dim; i++){
     for(j = 0; j <= i; j++){
-      printf(" %2.3e ", mat[ centrosym_ind(i,j) ]);
+      printf(" %2.1f ", mat[ centrosym_ind(i,j,dim) ]);
     }
     printf("\n");
   }
@@ -168,29 +168,29 @@ void centrosym_product(double *outmat, double *mat1, double *mat2, int dim)
   for(i = 0; i < dim; i++){
 
     for(j = 0; j <= i; j++)
-      outmat[ centrosym_ind(i,j) ] = 0.0;
+      outmat[ centrosym_ind(i,j,dim) ] = 0.0;
 
     for(k = 0; k <= i; k++){
 
       for(j = 0; j <= k; j++)
-        outmat[ centrosym_ind(i,j) ] += 
-          mat1[ centrosym_ind(i,k) ] * mat2[ centrosym_ind(k,j) ];
+        outmat[ centrosym_ind(i,j,dim) ] += 
+          mat1[ centrosym_ind(i,k,dim) ] * mat2[ centrosym_ind(k,j,dim) ];
 
       for(j = k+1; j <= i; j++)
-        outmat[ centrosym_ind(i,j) ] += 
-          mat1[ centrosym_ind(i,k) ] * mat2[ centrosym_ind(dim-k-1,dim-j-1) ];
+        outmat[ centrosym_ind(i,j,dim) ] += 
+          mat1[ centrosym_ind(i,k,dim) ] * mat2[ centrosym_ind(dim-k-1,dim-j-1,dim) ];
 
     }
 
     for(k = i+1 ; k < dim; k++){
 
       for(j = 0; j <= k; j++)
-        outmat[ centrosym_ind(i,j) ] += 
-          mat1[ centrosym_ind(dim-i-1,dim-k-1) ] * mat2[ centrosym_ind(k,j) ];
+        outmat[ centrosym_ind(i,j,dim) ] += 
+          mat1[ centrosym_ind(dim-i-1,dim-k-1,dim) ] * mat2[ centrosym_ind(k,j,dim) ];
 
       for(j = k+1; j <= i; j++)
-        outmat[ centrosym_ind(i,j) ] += 
-          mat1[ centrosym_ind(dim-i-1,dim-k-1) ] * mat2[ centrosym_ind(dim-k-1,dim-j-1) ];
+        outmat[ centrosym_ind(i,j,dim) ] += 
+          mat1[ centrosym_ind(dim-i-1,dim-k-1,dim) ] * mat2[ centrosym_ind(dim-k-1,dim-j-1,dim) ];
 
     }  
   }
@@ -221,8 +221,17 @@ void centrosym_product2(double *outmat, double *mat1, double *mat2, int dim)
   }
 }
 
+
+/*!
+ * Check if a square matrix is a valid centrosymmetric matrix.
+ *
+ * \param[in]  mat The square matrix.
+ * \param[in]  dim Its dimensions.
+ * \retval 1 if valid centrosymmetric matrix.
+ */
 int centrosym_isvalid(double *mat, int dim)
 {
+
   int i, j;
   for(i = 0; i < dim; i++){
     for(j = 0; j < dim; j++){
@@ -233,6 +242,7 @@ int centrosym_isvalid(double *mat, int dim)
     }
   }
   return 1;
+
 }
 
 
@@ -245,17 +255,39 @@ int centrosym_isvalid(double *mat, int dim)
  */
 double centrosym_trace(double *mat, int dim)
 {
+
   int i;
   double res = 0.0;
   for(i = 0; i < dim; i++){
-     res += mat[ centrosym_ind(i,i) ];
+     res += mat[ centrosym_ind(i,i,dim) ];
   }
   return res;
+
 }
 
 
 /*!
- * Compute the trace of the product of two centrosymmetric square matrices in compressed form.
+ * Compute the trace of the product of two centrosymmetric square matrices in compressed form (indirect, slowo).
+ *
+ * \param[in]  mat1 The first matrix.
+ * \param[in]  mat2 The second matrix.
+ * \param[in]  dim Their dimensions.
+ * \retval The trace of mat1  *mat2.
+ */
+double centrosym_traceprod2(double *mat1, double *mat2, int dim)
+{
+
+  double *matprod;
+  centrosym_alloc(&matprod, dim);
+  centrosym_product(matprod, mat1, mat2, dim);
+  double res = centrosym_trace(matprod, dim);
+  free(matprod);
+  return res;
+
+}
+
+/*!
+ * Compute the trace of the product of two centrosymmetric square matrices in compressed form (direct, fast).
  *
  * \param[in]  mat1 The first matrix.
  * \param[in]  mat2 The second matrix.
@@ -264,19 +296,21 @@ double centrosym_trace(double *mat, int dim)
  */
 double centrosym_traceprod(double *mat1, double *mat2, int dim)
 {
+
   int i, j;
   double res = 0.0;
   for(i = 0; i < dim; i++){
 
     for(j = 0; j <= i; j++){
-      res += mat1[ centrosym_ind(i,j) ] * mat2[ centrosym_ind(dim-j-1,dim-i-1) ];
+      res += mat1[ centrosym_ind(i,j,dim) ] * mat2[ centrosym_ind(dim-j-1,dim-i-1,dim) ];
     }
     for(j = i+1; j < dim; j++){
-      res += mat1[ centrosym_ind(dim-i-1,dim-j-1) ] * mat2[ centrosym_ind(j,i) ];
+      res += mat1[ centrosym_ind(dim-i-1,dim-j-1,dim) ] * mat2[ centrosym_ind(j,i,dim) ];
     }
 
   }
   return res;
+
 }
 
 
@@ -291,17 +325,19 @@ double centrosym_traceprod(double *mat1, double *mat2, int dim)
  */
 double centrosym_quadform(double *x, double *mat, double *y, int dim)
 {
+
   int i, j;
   double res = 0.0;
   for(i = 0; i < dim; i++){
 
     for(j = 0; j <= i; j++){
-      res += x[i] * y[j] * mat[ centrosym_ind(i,j) ] ;
+      res += x[i] * y[j] * mat[ centrosym_ind(i,j,dim) ] ;
     }
     for(j = i+1; j < dim; j++){
-      res += x[i] * y[j] * mat[ centrosym_ind(dim-i-1,dim-j-1) ] ;
+      res += x[i] * y[j] * mat[ centrosym_ind(dim-i-1,dim-j-1,dim) ] ;
     }
 
   }
   return res;
+
 }

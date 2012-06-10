@@ -9,14 +9,15 @@ void test_centrosym(int NREPEAT, int dim)
 {
   int res, irepeat;
   clock_t t1, t2;
-  double tmean_product_full, tmean_product_comp;
-  double tmean_traceprod_full, tmean_traceprod_comp, tmean_traceprodnaive_full, tmean_traceprodnaive_comp;
-  double tmean_quadform_full, tmean_quadform_comp;
+  double tmean_product_full=0, tmean_product_comp=0;
+  double tmean_traceprod_full=0, tmean_traceprod_comp=0;
+  double tmean_traceprodnaive_full=0, tmean_traceprodnaive_comp=0;
+  double tmean_quadform_full=0, tmean_quadform_comp=0;
 
   printf("\n==============================================\n");
   printf("Testing properties of centrosymmetric matrices\n");
   printf("----------------------------------------------\n");
-  printf("Testing matrix product and traceproduct");
+  printf("Performing benchmark");
 
   for( irepeat = 0; irepeat < NREPEAT; irepeat++ ){
     fflush(NULL);
@@ -72,6 +73,8 @@ void test_centrosym(int NREPEAT, int dim)
     // Extract and compare the two results
     res = centrosym_assertequal(matcomp4, matcomp3, dim);
     if(res == 0) printf("matcomp4 is not equal to matcomp3\n");
+    //centrosym_print(matcomp3, dim);
+    //centrosym_print(matcomp4, dim);
 
     // Test the trace of a product
     fflush(NULL); t1 = clock();
@@ -82,7 +85,7 @@ void test_centrosym(int NREPEAT, int dim)
     double traceprodcomp = centrosym_traceprod(matcomp1, matcomp2, dim);
     fflush(NULL); t2 = clock();
     tmean_traceprod_comp += (double)(t2 - t1) / (double)CLOCKS_PER_SEC;
-    if( cabs(traceprodfull - traceprodcomp) > 1e-10 ) printf("traceprodcomp is not equal to traceprodfull\n");
+    if( abs(traceprodfull - traceprodcomp) > 1e-10 ) printf("traceprodcomp is not equal to traceprodfull\n");
 
     fflush(NULL); t1 = clock();
     double traceprodfullnaive = square_trace(matfull3, dim);
@@ -92,7 +95,7 @@ void test_centrosym(int NREPEAT, int dim)
     double traceprodcompnaive = centrosym_trace(matcomp4, dim);
     fflush(NULL); t2 = clock();
     tmean_traceprodnaive_full += (double)(t2 - t1) / (double)CLOCKS_PER_SEC;
-    if( cabs(traceprodfullnaive - traceprodcompnaive) > 1e-10 ) printf("traceprodfullnaive is not equal to traceprodcompnaive\n");
+    if( abs(traceprodfullnaive - traceprodcompnaive) > 1e-10 ) printf("traceprodfullnaive is not equal to traceprodcompnaive\n");
 
     // Generate random vectors
     double *x = (double*)calloc(dim, sizeof(double));
@@ -110,7 +113,7 @@ void test_centrosym(int NREPEAT, int dim)
     fflush(NULL);t2 = clock();
     tmean_quadform_comp += (double)(t2 - t1) / (double)CLOCKS_PER_SEC;
     //printf("\n %f - %f = %2.2e\n",quadform_full,quadform_comp,quadform_full-quadform_comp);
-    if( cabs(quadform_full - quadform_comp) > 1e-6 ) printf("quadform_full is not equal to quadform_comp\n");
+    if( abs(quadform_full - quadform_comp) > 1e-6 ) printf("quadform_full is not equal to quadform_comp\n");
 
 
     free(x);
@@ -126,18 +129,22 @@ void test_centrosym(int NREPEAT, int dim)
   }
 
   printf("done\n");
-  //printf("Mean time for matrix product in full form : %4.4e seconds\n",tmean_product_full / (double)NREPEAT);
-  //printf("Mean time for matrix product in comp form : %4.4e seconds\n",tmean_product_comp / (double)NREPEAT);
-  printf("> Product acceleration factor : %2.2e \n", (double)tmean_product_full / (double)tmean_product_comp );
-  printf("> Product storage gain factor : %2.2e \n", ((double)dim*dim)/(dim*(dim+1)/2) );
-  //printf("Mean time for trace product in full form : %4.4e seconds\n",tmean_traceprod_full / (double)NREPEAT);
-  //printf("Mean time for trace product in comp form : %4.4e seconds\n",tmean_traceprod_comp / (double)NREPEAT);
-  //printf("Mean time for naive trace product in full form : %4.4e seconds\n",tmean_traceprodnaive_full / (double)NREPEAT);
-  //printf("Mean time for naive trace product in comp form : %4.4e seconds\n",tmean_traceprodnaive_comp / (double)NREPEAT);
-  printf("> Traceproduct acceleration factor : %2.2e \n", (double)tmean_traceprod_full / (double)tmean_traceprod_comp );
-  //printf("Mean time for full quadratic form : %4.4e seconds\n",tmean_quadform_full / (double)NREPEAT);
-  //printf("Mean time for compressed quadratic form : %4.4e seconds\n",tmean_quadform_comp / (double)NREPEAT);
-  printf("> Quadratic form acceleration factor : %2.2e \n", (double)tmean_quadform_full / (double)tmean_quadform_comp );
+
+  printf("> Memory gain due to compressed form : %2.2f \n", ((double)dim*dim)/(dim*(dim+1)/2) );
+
+  //printf("Mean time for matrix product in full form : %4.4f seconds\n",tmean_product_full / (double)NREPEAT);
+  //printf("Mean time for matrix product in comp form : %4.4f seconds\n",tmean_product_comp / (double)NREPEAT);
+  printf("> Matrix product acceleration factor : %2.2f \n", (double)tmean_product_full / (double)tmean_product_comp );
+
+  //printf("Mean time for trace product in full form : %4.4f seconds\n",tmean_traceprod_full / (double)NREPEAT);
+  //printf("Mean time for trace product in comp form : %4.4f seconds\n",tmean_traceprod_comp / (double)NREPEAT);
+  //printf("Mean time for naive trace product in full form : %4.4f seconds\n",tmean_traceprodnaive_full / (double)NREPEAT);
+  //printf("Mean time for naive trace product in comp form : %4.4f seconds\n",tmean_traceprodnaive_comp / (double)NREPEAT);
+  printf("> Trace-product acceleration factor  : %2.2f \n", (double)tmean_traceprod_full / (double)tmean_traceprod_comp );
+  
+  //printf("Mean time for full quadratic form : %4.4f seconds\n",tmean_quadform_full / (double)NREPEAT);
+  //printf("Mean time for compressed quadratic form : %4.4f seconds\n",tmean_quadform_comp / (double)NREPEAT);
+  printf("> Quadratic form acceleration factor : %2.2f \n", (double)tmean_quadform_full / (double)tmean_quadform_comp );
 
   printf("----------------------------------------------\n");
 
@@ -148,7 +155,8 @@ void test_centrosym(int NREPEAT, int dim)
 void test_bisym(int NREPEAT, int dim)
 {
   int res, irepeat;
-  clock_t t1, t2, tmean_product_full, tmean_product_comp;
+  clock_t t1, t2;
+  double tmean_product_full=0, tmean_product_comp=0;
 
   
   
@@ -221,8 +229,8 @@ void test_bisym(int NREPEAT, int dim)
   }
 
   printf("done\n");
-  printf("Mean time for matrix product in full form : %4.4e seconds\n",tmean_product_full / (double)CLOCKS_PER_SEC);
-  printf("Mean time for matrix product in comp form : %4.4e seconds\n",tmean_product_comp / (double)CLOCKS_PER_SEC);
+  printf("Mean time for matrix product in full form : %4.4f seconds\n",tmean_product_full / (double)CLOCKS_PER_SEC);
+  printf("Mean time for matrix product in comp form : %4.4f seconds\n",tmean_product_comp / (double)CLOCKS_PER_SEC);
   printf("> Acceleration factor : %f \n", (double)tmean_product_full / tmean_product_comp );
   printf("> Storage size factor : %f \n", ((double)dim*dim)/(dim*(dim+1)/2) );
 
@@ -236,11 +244,19 @@ void test_bisym(int NREPEAT, int dim)
 int main(int argc, char *argv[]) 
 {
 
-  const int dim = 100;
-  const long nside = 4;
+  const int dim = 6;
   const int NREPEAT = 5;
-  const int ellmax = 8;
-  const double thetacut = 60.0;
+
+  /*
+  int i, j;
+  double *mat;
+  centrosym_alloc(&mat, dim);
+  for(i=0;i<dim;i++)
+    for(j=0;j<dim;j++)
+      mat[centrosym_ind(i,j,dim)] = centrosym_ind(i,j,dim);
+
+  centrosym_print(mat, dim);
+  */
 
   printf("\n==============================================\n");
   printf("SYMTRX TESTS\n");

@@ -2,7 +2,7 @@
 #ifndef BISYM
 #define BISYM
 
-int bisym_size(dim);
+int bisym_size(int dim);
 void bisym_alloc(double **mat, int dim);
 int bisym_ind(int i, int j, int dim);
 void bisym_full_random(double *mat, int dim);
