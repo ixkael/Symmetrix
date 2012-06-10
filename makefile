@@ -27,9 +27,11 @@ LDFLAGS = -L$(SYMTRXLIB) -l$(SYMTRXLIBN)
 
 FFLAGS  = -I$(SYMTRXINC)
 
-SYMTRXOBJS= $(SYMTRXOBJ)/centrosym.o	\
+SYMTRXOBJS= $(SYMTRXOBJ)/bisym.o	\
+	  $(SYMTRXOBJ)/centrosym.o	\
 	  $(SYMTRXOBJ)/miscmath.o	\
-	  $(SYMTRXOBJ)/square.o
+	  $(SYMTRXOBJ)/square.o	\
+	  $(SYMTRXOBJ)/vector.o
 
 $(SYMTRXOBJ)/%.o: %.c
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@
@@ -37,7 +39,7 @@ $(SYMTRXOBJ)/%.o: %.c
 # ======================================== #
 
 .PHONY: default
-default: lib about tidy
+default: lib test about tidy
 
 .PHONY: all
 all: lib doc test about tidy

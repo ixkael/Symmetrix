@@ -42,7 +42,7 @@ void centrosym_alloc(double **mat, int dim)
  * \param[in]  dim Matrix dimension.
  * \retval The index in memory of the j-th element of the i-th row.
  */
-int centrosym_ind_safe(int i, int j, int dim){
+int centrosym_ind2(int i, int j, int dim){
 
   if( j <= i )
     return i * (i + 1) / 2 + j ;
@@ -53,7 +53,7 @@ int centrosym_ind_safe(int i, int j, int dim){
 
 
 /*!
- * Return index for the (i,j)th elements of a centrosymmetrix square matrix (fast; must have j <= i).
+ * Return index for the (i,j)th elements of a centrosymmetric square matrix (fast; must have j <= i).
  *
  * \param[in]  i Row index.
  * \param[in]  j Column index.
@@ -68,7 +68,7 @@ int centrosym_ind(int i, int j){
 
 
 /*!
- * Create random centrosymmetrix square matrix (full form, full square matrix).
+ * Create random centrosymmetric square matrix (full form, full square matrix).
  *
  * \param[out]  mat The matrix.
  * \param[in]  dim Its dimension.
@@ -221,14 +221,6 @@ void centrosym_product2(double *outmat, double *mat1, double *mat2, int dim)
   }
 }
 
-
-/*!
- * Check if a square matrix is a valid centrosymmetric matrix.
- *
- * \param[in]  mat The square matrix.
- * \param[in]  dim Its dimensions.
- * \retval 1 if valid centrosymmetric matrix.
- */
 int centrosym_isvalid(double *mat, int dim)
 {
   int i, j;
