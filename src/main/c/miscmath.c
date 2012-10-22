@@ -1,4 +1,13 @@
+// Symmetrix (SMTRX) package
+// Copyright (C) 2012
+// Boris Leistedt
+
 #include "symtrx.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
 
 /*!
  * Generate random number(double).

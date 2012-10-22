@@ -1,9 +1,17 @@
+// Symmetrix (SMTRX) package
+// Copyright (C) 2012
+// Boris Leistedt
+
 #include "symtrx.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
 
 #define PRECISION 1e-12
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
-
 
 /*!
  * Compute the actual size of a bisymmetric square matrix.

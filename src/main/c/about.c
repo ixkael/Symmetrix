@@ -1,4 +1,13 @@
+// Symmetrix (SMTRX) package
+// Copyright (C) 2012
+// Boris Leistedt
+
 #include <stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
 
 int main(int argc, char *argv[]) {
 

@@ -1,3 +1,6 @@
+// Symmetrix (SMTRX) package
+// Copyright (C) 2012
+// Boris Leistedt
 
 #ifndef VECTOR
 #define VECTOR

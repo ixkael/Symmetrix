@@ -11,29 +11,33 @@ OPT	= -Wall -O3 -g -DSYMTRX_VERSION=\"0.1\" -DSYMTRX_BUILD=\"`git describe`\"
 # ======================================== #
 
 SYMTRXDIR = .
-SYMTRXLIB = $(SYMTRXDIR)/lib/c
-SYMTRXINC = $(SYMTRXDIR)/include/c
-SYMTRXBIN = $(SYMTRXDIR)/bin/c
+SYMTRXLIB = $(SYMTRXDIR)/lib
+SYMTRXINC = $(SYMTRXDIR)/include
+SYMTRXBIN = $(SYMTRXDIR)/bin
 SYMTRXLIBN= symtrx
-SYMTRXSRC = $(SYMTRXDIR)/src/c
-SYMTRXOBJ = $(SYMTRXSRC)
+SYMTRXSRCMAIN = $(SYMTRXDIR)/src/main/c
+SYMTRXSRCTEST = $(SYMTRXDIR)/src/test/c
 
 # ======================================== #
 
-vpath %.c $(SYMTRXSRC)
-vpath %.h $(SYMTRXSRC)
+vpath %.c $(SYMTRXSRCMAIN)
+vpath %.c $(SYMTRXSRCTEST)
+vpath %.h $(SYMTRXINC)
 
 LDFLAGS = -L$(SYMTRXLIB) -l$(SYMTRXLIBN)
 
 FFLAGS  = -I$(SYMTRXINC)
 
-SYMTRXOBJS= $(SYMTRXOBJ)/bisym.o	\
-	  $(SYMTRXOBJ)/centrosym.o	\
-	  $(SYMTRXOBJ)/miscmath.o	\
-	  $(SYMTRXOBJ)/square.o	\
-	  $(SYMTRXOBJ)/vector.o
+SYMTRXOBJS= $(SYMTRXSRCMAIN)/bisym.o	\
+	  $(SYMTRXSRCMAIN)/centrosym.o	\
+	  $(SYMTRXSRCMAIN)/miscmath.o	\
+	  $(SYMTRXSRCMAIN)/square.o	\
+	  $(SYMTRXSRCMAIN)/vector.o
 
-$(SYMTRXOBJ)/%.o: %.c
+$(SYMTRXSRCMAIN)/%.o: %.c
+	$(CC) $(OPT) $(FFLAGS) -c $< -o $@
+
+$(SYMTRXSRCTEST)/%.o: %.c
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@
 
 # ======================================== #
@@ -51,13 +55,13 @@ $(SYMTRXLIB)/lib$(SYMTRXLIBN).a: $(SYMTRXOBJS)
 
 .PHONY: test
 test: $(SYMTRXBIN)/symtrx_test
-$(SYMTRXBIN)/symtrx_test: $(SYMTRXOBJ)/symtrx_test.o $(SYMTRXLIB)/lib$(SYMTRXLIBN).a
+$(SYMTRXBIN)/symtrx_test: $(SYMTRXSRCTEST)/symtrx_test.o $(SYMTRXLIB)/lib$(SYMTRXLIBN).a
 	$(CC) $(OPT) $< -o $(SYMTRXBIN)/symtrx_test $(LDFLAGS)
 	$(SYMTRXBIN)/symtrx_test
 
 .PHONY: about
 about: $(SYMTRXBIN)/about
-$(SYMTRXBIN)/about: $(SYMTRXOBJ)/about.o 
+$(SYMTRXBIN)/about: $(SYMTRXSRCMAIN)/about.o 
 	$(CC) $(OPT) $< -o $(SYMTRXBIN)/about
 	$(SYMTRXBIN)/about
 
@@ -76,8 +80,8 @@ clean:	tidy cleandoc
 
 .PHONY: tidy
 tidy:
-	rm -f $(SYMTRXOBJ)/*.o
-	rm -f $(SYMTRXOBJMEX)/*.o
+	rm -f $(SYMTRXSRCMAIN)/*.o
+	rm -f $(SYMTRXSRCTEST)/*.o
 	rm -f *~ 
 
 # ======================================== #

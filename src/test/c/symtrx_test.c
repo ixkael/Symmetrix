@@ -1,6 +1,14 @@
+// Symmetrix (SMTRX) package
+// Copyright (C) 2012
+// Boris Leistedt
 
 #include "symtrx.h"
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
@@ -146,7 +154,7 @@ void test_centrosym(int NREPEAT, int dim)
   //printf("Mean time for compressed quadratic form : %4.4f seconds\n",tmean_quadform_comp / (double)NREPEAT);
   printf("> Quadratic form acceleration factor : %2.2f \n", (double)tmean_quadform_full / (double)tmean_quadform_comp );
 
-  printf("----------------------------------------------\n");
+  printf("----------------------------------------------");
 
 }
 
@@ -188,7 +196,6 @@ void test_bisym(int NREPEAT, int dim)
     bisym_alloc(&matcomp2, dim);
     bisym_full_extractcomp(matcomp2, matfull2, dim);
 
-
     // Perform the product in full form
     double *matfull3;
     square_alloc(&matfull3, dim);
@@ -202,12 +209,12 @@ void test_bisym(int NREPEAT, int dim)
     bisym_full_extractcomp(matcomp3, matfull3, dim);
 
     // Check that the full form is still centrosymmetric
-    res = bisym_isvalid(matfull3, dim);
-    if(res == 0) printf("matfull3 is not bisymmetric\n");
+    res = centrosym_isvalid(matfull3, dim);
+    if(res == 0) printf("matfull3 is not centrosymmetric\n");
 
     // Perform the product in compressed fonm
     double *matcomp4;
-    bisym_alloc(&matcomp4, dim);
+    centrosym_alloc(&matcomp4, dim);
     t1 = clock();
     bisym_product(matcomp4, matcomp1, matcomp2, dim);
     t2 = clock();
@@ -215,7 +222,7 @@ void test_bisym(int NREPEAT, int dim)
     //printf("Matrix product in comp form : %4.4e seconds\n",(t2 - t1) / (double)CLOCKS_PER_SEC);
 
     // Extract and compare the two results
-    res = bisym_assertequal(matcomp4, matcomp3, dim);
+    res = centrosym_assertequal(matcomp4, matcomp3, dim);
     if(res == 0) printf("matcomp4 is not equal to matcomp3\n");
 
     free(matfull1);
@@ -234,7 +241,7 @@ void test_bisym(int NREPEAT, int dim)
   printf("> Acceleration factor : %f \n", (double)tmean_product_full / tmean_product_comp );
   printf("> Storage size factor : %f \n", ((double)dim*dim)/(dim*(dim+1)/2) );
 
-  printf("----------------------------------------------\n");
+  printf("----------------------------------------------");
 
   
 
@@ -244,8 +251,8 @@ void test_bisym(int NREPEAT, int dim)
 int main(int argc, char *argv[]) 
 {
 
-  const int dim = 6;
-  const int NREPEAT = 5;
+  const int dim = 256;
+  const int NREPEAT = 1;
 
   /*
   int i, j;
@@ -254,7 +261,6 @@ int main(int argc, char *argv[])
   for(i=0;i<dim;i++)
     for(j=0;j<dim;j++)
       mat[centrosym_ind(i,j,dim)] = centrosym_ind(i,j,dim);
-
   centrosym_print(mat, dim);
   */
 
@@ -271,6 +277,8 @@ int main(int argc, char *argv[])
   // Testing bisymmetric matrices
   test_bisym(NREPEAT, dim);
 
-  printf("\n");
+  
+  printf("\n==============================================\n");
   return 0;
+  
 }

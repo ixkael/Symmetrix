@@ -1,18 +1,14 @@
+// Symmetrix (SMTRX) package
+// Copyright (C) 2012
+// Boris Leistedt
 
 #ifndef SYMTRX
 #define SYMTRX
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <time.h>
-
-#include "../../src/c/bisym.h"
-#include "../../src/c/centrosym.h"
-#include "../../src/c/miscmath.h"
-#include "../../src/c/square.h"
-#include "../../src/c/vector.h"
-
+#include "bisym.h"
+#include "centrosym.h"
+#include "miscmath.h"
+#include "square.h"
+#include "vector.h"
 
 #endif
